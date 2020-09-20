@@ -1,18 +1,18 @@
 package com.perfectsoft.game.controller.cli;
 
-import com.perfectsoft.game.plot.Plot;
+import com.perfectsoft.game.controller.GameController;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public interface CliMenuSection {
+public interface CliMenuSection<T extends GameController> {
 
-    Consumer<CliMainGameController> get(String input);
+    Consumer<T> get(String input);
 
     List<String> getItemsToRender();
 
-    Optional<String> getErrorMessage();
+    Optional<String> getMessage();
 
-    void setErrorMessage(String msg);
+    void setMessage(String msg);
 }

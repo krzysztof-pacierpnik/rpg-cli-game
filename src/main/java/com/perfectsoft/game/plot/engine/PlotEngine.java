@@ -1,20 +1,26 @@
 package com.perfectsoft.game.plot.engine;
 
 import com.perfectsoft.game.plot.Plot;
+import com.perfectsoft.game.plot.PlotActionChannel;
 import com.perfectsoft.game.plot.PlotCharacter;
 import com.perfectsoft.game.plot.PlotStage;
 
 import java.util.List;
+import java.util.Optional;
 
 public class PlotEngine implements Plot {
 
-    private List<PlotStage> stages;
-    private PlotEngineCharacter hero;
+    private final List<PlotEngineStage> stages;
+    private final PlotEngineCharacter hero;
+    private final PlotActionChannel actionChannel;
 
-    @Override
-    public PlotStage getInitialStage() {
-        return stages.get(0);
+    public PlotEngine(PlotEngineCharacter hero, PlotActionChannel actionChannel, List<PlotEngineStage> stages) {
+        this.stages = stages;
+        this.hero = hero;
+        this.actionChannel = actionChannel;
     }
+
+    private int currentStageIdx = -1;
 
     @Override
     public PlotCharacter getPlotHero() {
@@ -23,23 +29,29 @@ public class PlotEngine implements Plot {
 
     @Override
     public PlotStage getCurrentStage() {
-        return null;
+        return stages.get(currentStageIdx);
     }
 
-    public List<PlotStage> getStages() {
-        return stages;
-    }
+    @Override
+    public Optional<PlotStage> nextStage() {
 
-    public void setStages(List<PlotStage> stages) {
-        this.stages = stages;
-    }
+        if (currentStageIdx != -1) {
 
-    public PlotEngineCharacter getHero() {
-        return hero;
-    }
+            PlotEngineStage currStage = stages.get(currentStageIdx);
+            actionChannel.unsubscribe(currStage);
+        }
 
-    public void setHero(PlotEngineCharacter hero) {
-        this.hero = hero;
+        if (currentStageIdx < stages.size() - 1) {
+
+            currentStageIdx++;
+            PlotEngineStage nextStage = stages.get(currentStageIdx);
+            actionChannel.subscribe(nextStage);
+            return Optional.of(nextStage);
+        } else {
+
+            currentStageIdx = -1;
+            return Optional.empty();
+        }
     }
 
     @Override

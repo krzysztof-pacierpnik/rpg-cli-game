@@ -4,5 +4,5 @@ import com.perfectsoft.game.controller.cli.CliMenuSection;
 
 public interface MenuRenderer {
 
-    void renderMenu(CliMenuSection cliMenuSection);
+    void renderMenu(CliMenuSection<?> cliMenuSection);
 }

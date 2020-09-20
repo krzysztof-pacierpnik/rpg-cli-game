@@ -1,15 +1,22 @@
 package com.perfectsoft.game.plot.engine;
 
+import com.perfectsoft.game.plot.PlotEvent;
 import com.perfectsoft.game.plot.PlotStage;
 
 import java.util.function.Consumer;
 
-public class PlotEngineQuest implements PlotQuest {
+public class PlotEngineEvent implements PlotEvent {
 
-    private String story;
-    private Consumer<PlotStage> plotAction;
-    private Consumer<PlotStage> plotReaction;
+    private final String story;
+    private final Consumer<PlotStage> plotAction;
+    private final Consumer<PlotStage> plotReaction;
     private boolean completed;
+
+    public PlotEngineEvent(String story, Consumer<PlotStage> plotAction, Consumer<PlotStage> plotReaction) {
+        this.story = story;
+        this.plotAction = plotAction;
+        this.plotReaction = plotReaction;
+    }
 
     @Override
     public String getStory() {

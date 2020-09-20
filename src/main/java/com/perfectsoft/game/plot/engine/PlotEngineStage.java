@@ -1,46 +1,52 @@
 package com.perfectsoft.game.plot.engine;
 
 import com.perfectsoft.game.controller.GameController;
-import com.perfectsoft.game.controller.QuestController;
 import com.perfectsoft.game.physics.PhysicsCharacter;
 import com.perfectsoft.game.physics.PhysicsStage;
+import com.perfectsoft.game.plot.PlotCharacter;
+import com.perfectsoft.game.plot.PlotEvent;
 import com.perfectsoft.game.plot.PlotStage;
+import com.perfectsoft.game.plot.actions.ActionFactory;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class PlotEngineStage implements PlotStage, Consumer<Consumer<PlotStage>> {
 
     private final PhysicsStage physicsStage;
-    private final Map<Consumer<PlotStage>, PlotEngineQuest> quests;
-    private final QuestController questController;
+    private final Map<Consumer<PlotStage>, PlotEngineEvent> events;
+    private final PlotEngineCharacter hero;
 
     private boolean running;
-    private PlotEngineQuest questToShow;
+    private PlotEngineEvent eventToShow;
 
-    public PlotEngineStage(Map<Consumer<PlotStage>, PlotEngineQuest> quests, PhysicsStage physicsStage,
-                           QuestController questController) {
+    public PlotEngineStage(PhysicsStage physicsStage, PlotEngineCharacter hero, List<PlotEngineEvent> events) {
 
-        this.quests = quests;
         this.physicsStage = physicsStage;
-        this.questController = questController;
+        this.hero = hero;
+        this.events = events.stream().collect(Collectors.toMap(PlotEngineEvent::getPlotAction, event -> event));
     }
 
     @Override
     public GameController getCurrentController() {
 
-        GameController currentController;
-        if (questToShow != null) {
+        PhysicsCharacter movingCharacter = physicsStage.getMovingCharacter();
+        return movingCharacter.getGameController();
+    }
 
-            questController.setPlotQuestToShow(questToShow);
-            currentController = questController;
-            questToShow = null;
-        } else {
+    @Override
+    public Optional<PlotEvent> removeEventToShow() {
+        Optional<PlotEvent> res = Optional.ofNullable(eventToShow);
+        eventToShow = null;
+        return res;
+    }
 
-            PhysicsCharacter movingCharacter = physicsStage.getMovingCharacter();
-            return movingCharacter.getGameController();
-        }
-        return currentController;
+    @Override
+    public boolean hasEventToShow() {
+        return eventToShow != null;
     }
 
     public PhysicsStage getPhysicsStage() {
@@ -48,7 +54,35 @@ public class PlotEngineStage implements PlotStage, Consumer<Consumer<PlotStage>>
     }
 
     @Override
+    public void characterKilledCharacter(PlotCharacter killer, PlotCharacter victim) {
+    }
+
+    @Override
+    public void heroDied() {
+        hero.die();
+        quit();
+    }
+
+    @Override
+    public void accept(Consumer<PlotStage> plotAction) {
+
+        Consumer<PlotStage> actualAction;
+        if (hero.getPhysicsCharacter().isDead()) {
+            actualAction = ActionFactory.getInstance().heroDiedAction();
+        } else {
+            actualAction = plotAction;
+        }
+        actualAction.accept(this);
+
+        eventToShow = events.get(actualAction);
+        if (eventToShow != null) {
+            eventToShow.setCompleted(true);
+        }
+    }
+
+    @Override
     public void run() {
+        accept(ActionFactory.getInstance().runStageAction());
         running = true;
     }
 
@@ -63,12 +97,7 @@ public class PlotEngineStage implements PlotStage, Consumer<Consumer<PlotStage>>
     }
 
     @Override
-    public void accept(Consumer<PlotStage> plotAction) {
-
-        plotAction.accept(this);
-        questToShow = quests.get(plotAction);
-        if (questToShow != null) {
-            questToShow.setCompleted(true);
-        }
+    public PlotCharacter getPlotHero() {
+        return hero;
     }
 }

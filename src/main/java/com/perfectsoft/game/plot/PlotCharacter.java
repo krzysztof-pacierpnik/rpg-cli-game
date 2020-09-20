@@ -1,6 +1,5 @@
 package com.perfectsoft.game.plot;
 
-import com.perfectsoft.game.controller.GameController;
 import com.perfectsoft.game.physics.PhysicsCharacter;
 
 public interface PlotCharacter {
@@ -10,4 +9,6 @@ public interface PlotCharacter {
     void setName(String name);
 
     String getName();
+
+    void die();
 }

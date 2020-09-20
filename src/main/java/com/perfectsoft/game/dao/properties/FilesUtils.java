@@ -14,12 +14,16 @@ public final class FilesUtils {
 
     private FilesUtils() {}
 
-    public static Properties readTemplate(String templateGroup, String templateName) throws IOException {
-
+    public static Properties loadProperties(String path) throws IOException {
         Properties properties = new Properties();
-        String path = String.format("/template/%s/%s.properties", templateGroup, templateName);
         properties.load(FilesUtils.class.getResourceAsStream(path));
         return properties;
+    }
+
+    public static Properties readTemplate(String templateGroup, String templateName) throws IOException {
+
+        String path = String.format("/template/%s/%s.properties", templateGroup, templateName);
+        return loadProperties(path);
     }
 
     public static byte[][] readTexture(String templateGroup, String textureName) throws IOException, URISyntaxException {
@@ -29,7 +33,7 @@ public final class FilesUtils {
         List<String> lines = Files.readAllLines(pictureFile, StandardCharsets.US_ASCII);
         byte[][] rawContent = lines.stream().map(String::getBytes).toArray(byte[][]::new);
         int maxLineLength = Arrays.stream(rawContent).map(row -> row.length).max(Integer::compareTo).orElse(0);
-        byte[][] normalizedContent = Arrays.stream(rawContent).map(row -> {
+        return Arrays.stream(rawContent).map(row -> {
             byte[] normalizedRow = row;
             if (row.length < maxLineLength) {
                 normalizedRow = new byte[maxLineLength];
@@ -39,6 +43,5 @@ public final class FilesUtils {
             }
             return normalizedRow;
         }).toArray(byte[][]::new);
-        return normalizedContent;
     }
 }

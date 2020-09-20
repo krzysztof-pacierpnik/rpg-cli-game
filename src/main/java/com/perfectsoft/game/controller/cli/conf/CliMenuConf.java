@@ -13,24 +13,31 @@ public final class CliMenuConf {
 
     private CliMenuConf() {}
 
-    public static CliMenu createMenu() {
+    public static CliMenu<CliMainGameController> createMainMenu() {
 
-        CliMenuSection mainSection = new CliMenuChoiceSection(List.of(
-                new CliMenuActionItem("c", "Create character",
+        CliMenuSection<CliMainGameController> mainSection = new CliMenuChoiceSection<>(List.of(
+                new CliMenuActionItem<>("c", "Create character",
                         ctrl -> ctrl.goToMenuSection(CREATE_CHARACTER)),
-                new CliMenuActionItem("n", "New game",
+                new CliMenuActionItem<>("n", "New game",
                         CliMainGameController::startNewGame),
-                new CliMenuActionItem("l", "Load game",
+                new CliMenuActionItem<>("l", "Load game",
                         ctrl -> ctrl.goToMenuSection(LOAD_GAME)),
-                new CliMenuActionItem("q", "Quit game",
+                new CliMenuActionItem<>("q", "Quit game",
                         CliMainGameController::quit)
         ));
-        CliMenuSection createCharacterSection = new CliMenuInputSection("Input character name:",
+        CliMenuSection<CliMainGameController> createCharacterSection = new CliMenuInputSection<>("Input character name:",
                 ctr -> {if (ctr.createCharacter()) ctr.goToMenuSection(MAIN);});
-        CliMenuSection loadSection = new CliMenuInputSection("Input save name:",
+        CliMenuSection<CliMainGameController> loadSection = new CliMenuInputSection<>("Input save name:",
                 ctr -> {if (ctr.load()) ctr.goToMenuSection(MAIN);});
 
-        return new CliMenu(mainSection, Map.of(MAIN, mainSection, CREATE_CHARACTER, createCharacterSection,
+        return new CliMenu<>(mainSection, Map.of(MAIN, mainSection, CREATE_CHARACTER, createCharacterSection,
                 LOAD_GAME, loadSection));
+    }
+
+    public static CliMenuSection<CliPlotController> getEventMenuSection() {
+
+        return new CliMenuChoiceSection<>(List.of(
+                new CliMenuActionItem<>("q", "OK", CliPlotController::quit)
+        ));
     }
 }

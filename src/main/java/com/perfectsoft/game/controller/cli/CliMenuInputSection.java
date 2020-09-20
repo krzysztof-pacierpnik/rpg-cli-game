@@ -1,37 +1,39 @@
 package com.perfectsoft.game.controller.cli;
 
+import com.perfectsoft.game.controller.GameController;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class CliMenuInputSection implements CliMenuSection {
+public class CliMenuInputSection<T extends GameController> implements CliMenuSection<T> {
 
     private final String description;
-    private final Consumer<CliMainGameController> controllerConsumer;
+    private final Consumer<T> controllerConsumer;
     private String errorMessage;
 
-    public CliMenuInputSection(String description, Consumer<CliMainGameController> controllerConsumer) {
+    public CliMenuInputSection(String description, Consumer<T> controllerConsumer) {
         this.description = description;
         this.controllerConsumer = controllerConsumer;
     }
 
     @Override
-    public Consumer<CliMainGameController> get(String input) {
-        return new InputConsumer(input, controllerConsumer);
+    public Consumer<T> get(String input) {
+        return new InputConsumer<T>(input, controllerConsumer);
     }
 
-    private static class InputConsumer implements Consumer<CliMainGameController> {
+    private static class InputConsumer<T extends GameController> implements Consumer<T> {
 
         private final String input;
-        private final Consumer<CliMainGameController> consumer;
+        private final Consumer<T> consumer;
 
-        public InputConsumer(String input, Consumer<CliMainGameController> consumer) {
+        public InputConsumer(String input, Consumer<T> consumer) {
             this.input = input;
             this.consumer = consumer;
         }
 
         @Override
-        public void accept(CliMainGameController cliMainGameController) {
+        public void accept(T cliMainGameController) {
             cliMainGameController.setInput(input);
             consumer.accept(cliMainGameController);
         }
@@ -43,12 +45,12 @@ public class CliMenuInputSection implements CliMenuSection {
     }
 
     @Override
-    public Optional<String> getErrorMessage() {
+    public Optional<String> getMessage() {
         return Optional.ofNullable(errorMessage);
     }
 
     @Override
-    public void setErrorMessage(String errorMessage) {
+    public void setMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
 }

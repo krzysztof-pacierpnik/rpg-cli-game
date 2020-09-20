@@ -2,11 +2,13 @@ package com.perfectsoft.game.plot;
 
 import com.perfectsoft.game.dao.Loadable;
 
-public interface Plot extends Loadable<Plot> {
+import java.util.Optional;
 
-    PlotStage getInitialStage();
+public interface Plot extends Loadable<Plot> {
 
     PlotStage getCurrentStage();
 
     PlotCharacter getPlotHero();
+
+    Optional<PlotStage> nextStage();
 }
