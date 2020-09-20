@@ -6,9 +6,11 @@ import com.perfectsoft.game.render.PlotRenderer;
 
 public class CliPlotPrinter implements PlotRenderer {
 
+    private final CliMenuPrinterService cliMenuPrinterService;
     private final String messageTitle;
 
-    public CliPlotPrinter(String messageTitle) {
+    public CliPlotPrinter(CliMenuPrinterService cliMenuPrinterService, String messageTitle) {
+        this.cliMenuPrinterService = cliMenuPrinterService;
         this.messageTitle = messageTitle;
     }
 
@@ -17,7 +19,7 @@ public class CliPlotPrinter implements PlotRenderer {
 
         plotStage.removeEventToShow().ifPresent(plotEvent -> {
             cliMenuSection.setMessage(plotEvent.getStory());
-            CliUtils.printMenuWithMessage(cliMenuSection, messageTitle);
+            cliMenuPrinterService.printMenuWithMessage(cliMenuSection, messageTitle);
         });
     }
 }

@@ -2,19 +2,19 @@ package com.perfectsoft.game.plot.actions;
 
 import com.perfectsoft.game.plot.PlotCharacter;
 
-public class ActionFactory {
+public class PlotActionFactory {
 
-    private final static ActionFactory actionFactory = new ActionFactory();
+    private final static PlotActionFactory PLOT_ACTION_FACTORY = new PlotActionFactory();
 
     private final DoNothingAction doNothingAction = new DoNothingAction();
     private final FinishStageAction finishStageAction = new FinishStageAction();
     private final HeroDiedAction heroDiedAction = new HeroDiedAction();
     private final RunStageAction runStageAction = new RunStageAction();
 
-    private ActionFactory() {}
+    private PlotActionFactory() {}
 
-    public static ActionFactory getInstance() {
-        return actionFactory;
+    public static PlotActionFactory getInstance() {
+        return PLOT_ACTION_FACTORY;
     }
 
     public CharacterKilledCharacterAction characterKilledCharacterAction(PlotCharacter killer, PlotCharacter victim) {

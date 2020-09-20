@@ -4,15 +4,14 @@ import com.perfectsoft.game.conf.PlotConf;
 import com.perfectsoft.game.controller.GameController;
 import com.perfectsoft.game.plot.Plot;
 import com.perfectsoft.game.plot.PlotActionChannel;
+import com.perfectsoft.game.plot.actions.PlotActionFactory;
 import com.perfectsoft.game.render.MenuRenderer;
 
-import java.util.Properties;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
 public class CliMainGameController implements GameController {
 
-    private final Properties properties;
     private final PlotActionChannel plotActionChannel;
     private final CliMenu<CliMainGameController> cliMenu;
     private final MenuRenderer menuRenderer;
@@ -21,19 +20,19 @@ public class CliMainGameController implements GameController {
     private final CliMainStageController cliMainStageController;
     private final CliStageController cliStageController;
     private final PlotConf plotConf;
+    private final PlotActionFactory plotActionFactory;
     private final Scanner scanner;
 
     private Plot plot;
     private boolean runGame;
     private String input;
 
-    public CliMainGameController(Properties properties, PlotActionChannel plotActionChannel,
+    public CliMainGameController(PlotActionChannel plotActionChannel,
                                  CliMenu<CliMainGameController> cliMenu, MenuRenderer menuRenderer,
                                  CliMainStageController stageController, CliPlotController cliPlotController,
                                  CliMainStageController cliMainStageController, CliStageController cliStageController,
-                                 PlotConf plotConf, Scanner scanner) {
+                                 PlotConf plotConf, PlotActionFactory plotActionFactory, Scanner scanner) {
 
-        this.properties = properties;
         this.plotActionChannel = plotActionChannel;
         this.cliMenu = cliMenu;
         this.menuRenderer = menuRenderer;
@@ -42,6 +41,7 @@ public class CliMainGameController implements GameController {
         this.cliMainStageController = cliMainStageController;
         this.cliStageController = cliStageController;
         this.plotConf = plotConf;
+        this.plotActionFactory = plotActionFactory;
         this.scanner = scanner;
 
         this.runGame = true;
@@ -62,7 +62,7 @@ public class CliMainGameController implements GameController {
         boolean success = false;
         try {
             //create plot
-            plot = plotConf.createPhysicsAndPlot(properties, plotActionChannel, cliStageController);
+            plot = plotConf.createPhysicsAndPlot(plotActionChannel, plotActionFactory, cliStageController);
             //set plot on controllers and
             cliStageController.setPlot(plot);
             cliPlotController.setPlot(plot);

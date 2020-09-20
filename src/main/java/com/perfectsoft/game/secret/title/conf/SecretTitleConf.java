@@ -3,24 +3,28 @@ package com.perfectsoft.game.secret.title.conf;
 import com.perfectsoft.game.conf.PlotConf;
 import com.perfectsoft.game.controller.artificial.KillHeroController;
 import com.perfectsoft.game.controller.cli.CliStageController;
+import com.perfectsoft.game.dao.properties.FilesUtils;
 import com.perfectsoft.game.physics.fromabove.FromAbovePhysicsCharacter;
 import com.perfectsoft.game.physics.fromabove.FromAbovePhysicsStage;
 import com.perfectsoft.game.plot.PlotActionChannel;
 import com.perfectsoft.game.plot.actions.*;
 import com.perfectsoft.game.plot.engine.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
 public final class SecretTitleConf implements PlotConf {
 
-    public PlotEngine createPhysicsAndPlot(Properties properties,
-                                            PlotActionChannel plotActionChannel,
-                                            CliStageController cliStageController) {
+    public PlotEngine createPhysicsAndPlot(PlotActionChannel plotActionChannel,
+                                            PlotActionFactory plotActionFactory,
+                                            CliStageController cliStageController) throws IOException {
 
+        Properties properties = FilesUtils.loadProperties("/secret-title.properties");
         //configure physics with artificial controllers
-        // TODO load from templates and set locations
-        FromAbovePhysicsCharacter heroPhysics = new FromAbovePhysicsCharacter(cliStageController, plotActionChannel);
+        // TODO load textures and set locations
+        FromAbovePhysicsCharacter heroPhysics = new FromAbovePhysicsCharacter(cliStageController, plotActionChannel,
+                plotActionFactory);
         heroPhysics.setAttack(Integer.parseInt(properties.getProperty("warrior.physics.attack")));
         heroPhysics.setDefence(Integer.parseInt(properties.getProperty("warrior.physics.defence")));
         heroPhysics.setSpeed(Integer.parseInt(properties.getProperty("warrior.physics.speed")));
@@ -28,7 +32,8 @@ public final class SecretTitleConf implements PlotConf {
         heroPhysics.setExperience(Integer.parseInt(properties.getProperty("warrior.physics.experience")));
 
         KillHeroController monsterFrogController = new KillHeroController(heroPhysics);
-        FromAbovePhysicsCharacter monsterFrogPhysics = new FromAbovePhysicsCharacter(monsterFrogController, plotActionChannel);
+        FromAbovePhysicsCharacter monsterFrogPhysics = new FromAbovePhysicsCharacter(monsterFrogController,
+                plotActionChannel, plotActionFactory);
         monsterFrogPhysics.setAttack(Integer.parseInt(properties.getProperty("monster-frog.physics.attack")));
         monsterFrogPhysics.setDefence(Integer.parseInt(properties.getProperty("monster-frog.physics.defence")));
         monsterFrogPhysics.setSpeed(Integer.parseInt(properties.getProperty("monster-frog.physics.speed")));
@@ -41,13 +46,12 @@ public final class SecretTitleConf implements PlotConf {
         PlotEngineCharacter hero = new PlotEngineCharacter(heroPhysics, "nigth-rambler");
         PlotEngineCharacter monsterFrog = new PlotEngineCharacter(monsterFrogPhysics, "monster-frog");
 
-        ActionFactory actionFactory = ActionFactory.getInstance();
-        RunStageAction runStageAction = actionFactory.runStageAction();
-        DoNothingAction doNothingAction = actionFactory.getDoNothingAction();
-        FinishStageAction finishStageAction = actionFactory.finishStageAction();
+        RunStageAction runStageAction = plotActionFactory.runStageAction();
+        DoNothingAction doNothingAction = plotActionFactory.getDoNothingAction();
+        FinishStageAction finishStageAction = plotActionFactory.finishStageAction();
         CharacterKilledCharacterAction killMonsterFrogAction =
-                actionFactory.characterKilledCharacterAction(hero, monsterFrog);
-        HeroDiedAction heroDiedAction = actionFactory.heroDiedAction();
+                plotActionFactory.characterKilledCharacterAction(hero, monsterFrog);
+        HeroDiedAction heroDiedAction = plotActionFactory.heroDiedAction();
 
         String initStory = properties.getProperty("explore-station.plot.init-story");
         PlotEngineEvent startStageEvent = new PlotEngineEvent(initStory, runStageAction, doNothingAction);
@@ -57,7 +61,7 @@ public final class SecretTitleConf implements PlotConf {
         PlotEngineEvent heroDiedEvent = new PlotEngineEvent(failStory, heroDiedAction, finishStageAction);
 
         PlotEngineStage exploreStation = new PlotEngineStage(secretTitlePhysicsStage, hero,
-                List.of(startStageEvent, killMonsterFrogEvent, heroDiedEvent));
+                List.of(startStageEvent, killMonsterFrogEvent, heroDiedEvent), plotActionFactory);
 
         return new PlotEngine(hero, plotActionChannel, List.of(exploreStation));
     }

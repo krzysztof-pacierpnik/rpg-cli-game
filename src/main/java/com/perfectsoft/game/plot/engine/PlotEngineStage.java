@@ -6,7 +6,7 @@ import com.perfectsoft.game.physics.PhysicsStage;
 import com.perfectsoft.game.plot.PlotCharacter;
 import com.perfectsoft.game.plot.PlotEvent;
 import com.perfectsoft.game.plot.PlotStage;
-import com.perfectsoft.game.plot.actions.ActionFactory;
+import com.perfectsoft.game.plot.actions.PlotActionFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -19,15 +19,18 @@ public class PlotEngineStage implements PlotStage, Consumer<Consumer<PlotStage>>
     private final PhysicsStage physicsStage;
     private final Map<Consumer<PlotStage>, PlotEngineEvent> events;
     private final PlotEngineCharacter hero;
+    private final PlotActionFactory actionFactory;
 
     private boolean running;
     private PlotEngineEvent eventToShow;
 
-    public PlotEngineStage(PhysicsStage physicsStage, PlotEngineCharacter hero, List<PlotEngineEvent> events) {
+    public PlotEngineStage(PhysicsStage physicsStage, PlotEngineCharacter hero, List<PlotEngineEvent> events,
+                           PlotActionFactory actionFactory) {
 
         this.physicsStage = physicsStage;
         this.hero = hero;
         this.events = events.stream().collect(Collectors.toMap(PlotEngineEvent::getPlotAction, event -> event));
+        this.actionFactory = actionFactory;
     }
 
     @Override
@@ -68,7 +71,7 @@ public class PlotEngineStage implements PlotStage, Consumer<Consumer<PlotStage>>
 
         Consumer<PlotStage> actualAction;
         if (hero.getPhysicsCharacter().isDead()) {
-            actualAction = ActionFactory.getInstance().heroDiedAction();
+            actualAction = actionFactory.heroDiedAction();
         } else {
             actualAction = plotAction;
         }
@@ -82,7 +85,7 @@ public class PlotEngineStage implements PlotStage, Consumer<Consumer<PlotStage>>
 
     @Override
     public void run() {
-        accept(ActionFactory.getInstance().runStageAction());
+        accept(PlotActionFactory.getInstance().runStageAction());
         running = true;
     }
 

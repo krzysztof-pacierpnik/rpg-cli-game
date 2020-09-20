@@ -3,7 +3,7 @@ package com.perfectsoft.game.controller.cli;
 import com.perfectsoft.game.controller.GameController;
 import com.perfectsoft.game.plot.Plot;
 import com.perfectsoft.game.plot.PlotActionChannel;
-import com.perfectsoft.game.plot.actions.ActionFactory;
+import com.perfectsoft.game.plot.actions.PlotActionFactory;
 
 import java.util.Scanner;
 
@@ -22,7 +22,7 @@ public class CliStageController implements GameController {
     @Override
     public void run() {
         //TODO
-        plotActionChannel.publish(ActionFactory.getInstance().heroDiedAction());
+        plotActionChannel.publish(PlotActionFactory.getInstance().heroDiedAction());
     }
 
     public void setPlot(Plot plot) {

@@ -3,10 +3,12 @@ package com.perfectsoft.game.conf;
 import com.perfectsoft.game.controller.cli.*;
 import com.perfectsoft.game.controller.cli.conf.CliMenuConf;
 import com.perfectsoft.game.dao.properties.FilesUtils;
+import com.perfectsoft.game.plot.actions.PlotActionFactory;
 import com.perfectsoft.game.plot.engine.PlotEngineActionChannel;
 import com.perfectsoft.game.render.MenuRenderer;
 import com.perfectsoft.game.render.PlotRenderer;
 import com.perfectsoft.game.render.cli.CliMenuPrinter;
+import com.perfectsoft.game.render.cli.CliMenuPrinterService;
 import com.perfectsoft.game.render.cli.CliPlotPrinter;
 
 import java.io.IOException;
@@ -29,12 +31,15 @@ public final class GameConf {
 
         //create action channels
         PlotEngineActionChannel plotEngineActionChannel = new PlotEngineActionChannel();
+        PlotActionFactory plotActionFactory = PlotActionFactory.getInstance();
 
         //create cli controllers
+        CliMenuPrinterService cliMenuPrinterService = new CliMenuPrinterService(
+                properties.getProperty("render.cli.menu.message-template"));
         CliMenu<CliMainGameController> cliMenu = CliMenuConf.createMainMenu();
-        MenuRenderer menuRenderer = new CliMenuPrinter("MESSAGE");
+        MenuRenderer menuRenderer = new CliMenuPrinter(cliMenuPrinterService, "MESSAGE");
         CliMenuSection<CliPlotController> eventMenuSection = CliMenuConf.getEventMenuSection();
-        PlotRenderer plotRenderer = new CliPlotPrinter("STORY");
+        PlotRenderer plotRenderer = new CliPlotPrinter(cliMenuPrinterService, "STORY");
 
         Scanner scanner = new Scanner(System.in);
         CliPlotController cliPlotController = new CliPlotController(plotRenderer, eventMenuSection, scanner);
@@ -42,7 +47,7 @@ public final class GameConf {
         CliStageController cliStageController = new CliStageController(scanner, plotEngineActionChannel);
 
 
-        return new CliMainGameController(properties, plotEngineActionChannel, cliMenu, menuRenderer, cliMainStageController,
-                cliPlotController, cliMainStageController, cliStageController, plotConf, scanner);
+        return new CliMainGameController(plotEngineActionChannel, cliMenu, menuRenderer, cliMainStageController,
+                cliPlotController, cliMainStageController, cliStageController, plotConf, plotActionFactory, scanner);
     }
 }

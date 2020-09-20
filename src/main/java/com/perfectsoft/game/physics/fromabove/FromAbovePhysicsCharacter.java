@@ -4,12 +4,13 @@ import com.perfectsoft.game.controller.GameController;
 import com.perfectsoft.game.physics.PhysicsCharacter;
 import com.perfectsoft.game.plot.PlotActionChannel;
 import com.perfectsoft.game.plot.PlotCharacter;
-import com.perfectsoft.game.plot.actions.ActionFactory;
+import com.perfectsoft.game.plot.actions.PlotActionFactory;
 
 public class FromAbovePhysicsCharacter implements PhysicsCharacter {
 
     private final GameController gameController;
     private final PlotActionChannel plotActionChannel;
+    private final PlotActionFactory plotActionFactory;
 
     private PlotCharacter plotCharacter;
 
@@ -20,9 +21,11 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
     private int speed;
     private int actionPoints;
 
-    public FromAbovePhysicsCharacter(GameController gameController, PlotActionChannel plotActionChannel) {
+    public FromAbovePhysicsCharacter(GameController gameController, PlotActionChannel plotActionChannel,
+                                     PlotActionFactory plotActionFactory) {
         this.gameController = gameController;
         this.plotActionChannel = plotActionChannel;
+        this.plotActionFactory = plotActionFactory;
     }
 
     @Override
@@ -32,7 +35,7 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
 
     private void killed(FromAbovePhysicsCharacter victim) {
         plotActionChannel.publish(
-                ActionFactory.getInstance().characterKilledCharacterAction(getPlotCharacter(), victim.getPlotCharacter()));
+                PlotActionFactory.getInstance().characterKilledCharacterAction(getPlotCharacter(), victim.getPlotCharacter()));
     }
 
     public PlotCharacter getPlotCharacter() {
