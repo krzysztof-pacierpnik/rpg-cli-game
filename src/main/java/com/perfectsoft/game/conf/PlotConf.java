@@ -6,7 +6,6 @@ import com.perfectsoft.game.plot.actions.PlotActionFactory;
 import com.perfectsoft.game.plot.engine.PlotEngine;
 
 import java.io.IOException;
-import java.util.Properties;
 
 public interface PlotConf {
 

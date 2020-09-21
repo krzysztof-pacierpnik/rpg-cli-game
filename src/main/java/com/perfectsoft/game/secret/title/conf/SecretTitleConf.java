@@ -28,7 +28,7 @@ public final class SecretTitleConf implements PlotConf {
         heroPhysics.setAttack(Integer.parseInt(properties.getProperty("warrior.physics.attack")));
         heroPhysics.setDefence(Integer.parseInt(properties.getProperty("warrior.physics.defence")));
         heroPhysics.setSpeed(Integer.parseInt(properties.getProperty("warrior.physics.speed")));
-        heroPhysics.setHitPoints(Integer.parseInt(properties.getProperty("warrior.physics.hit-points")));
+        heroPhysics.setMaxHitPoints(Integer.parseInt(properties.getProperty("warrior.physics.hit-points")));
         heroPhysics.setExperience(Integer.parseInt(properties.getProperty("warrior.physics.experience")));
 
         KillHeroController monsterFrogController = new KillHeroController(heroPhysics);
@@ -37,7 +37,7 @@ public final class SecretTitleConf implements PlotConf {
         monsterFrogPhysics.setAttack(Integer.parseInt(properties.getProperty("monster-frog.physics.attack")));
         monsterFrogPhysics.setDefence(Integer.parseInt(properties.getProperty("monster-frog.physics.defence")));
         monsterFrogPhysics.setSpeed(Integer.parseInt(properties.getProperty("monster-frog.physics.speed")));
-        monsterFrogPhysics.setHitPoints(Integer.parseInt(properties.getProperty("monster-frog.physics.hit-points")));
+        monsterFrogPhysics.setMaxHitPoints(Integer.parseInt(properties.getProperty("monster-frog.physics.hit-points")));
         monsterFrogPhysics.setExperience(Integer.parseInt(properties.getProperty("monster-frog.physics.experience")));
         monsterFrogController.setCharacter(monsterFrogPhysics);
 

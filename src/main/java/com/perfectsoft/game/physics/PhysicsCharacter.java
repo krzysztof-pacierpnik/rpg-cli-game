@@ -9,5 +9,15 @@ public interface PhysicsCharacter {
 
     void setPlotCharacter(PlotCharacter plotCharacter);
 
+    void move(Direction direction);
+
+    void rotate(RotationDirection rotationDirection);
+
+    void attack();
+
+    void heal();
+
+    void endTurn();
+
     boolean isDead();
 }
