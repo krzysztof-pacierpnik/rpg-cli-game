@@ -4,27 +4,28 @@ import com.perfectsoft.game.controller.GameController;
 import com.perfectsoft.game.physics.Direction;
 import com.perfectsoft.game.physics.RotationDirection;
 import com.perfectsoft.game.plot.Plot;
-import com.perfectsoft.game.plot.PlotActionChannel;
-import com.perfectsoft.game.plot.actions.PlotActionFactory;
 
 import java.util.Scanner;
+import java.util.function.Consumer;
 
 public class CliStageController implements GameController {
 
     private final Scanner scanner;
-    private final PlotActionChannel plotActionChannel;
+    private final CliMenu<CliStageController> stageMenu;
 
     private Plot plot;
 
-    public CliStageController(Scanner scanner, PlotActionChannel plotActionChannel) {
+    public CliStageController(Scanner scanner, CliMenu<CliStageController> stageMenu) {
         this.scanner = scanner;
-        this.plotActionChannel = plotActionChannel;
+        this.stageMenu = stageMenu;
     }
 
     @Override
     public void run() {
-        //TODO
-        plotActionChannel.publish(PlotActionFactory.getInstance().heroDiedAction());
+        String input = scanner.next();
+        Consumer<CliStageController> cmd = stageMenu.get(input);
+        cmd.accept(this);
+
     }
 
     public void setPlot(Plot plot) {
@@ -34,23 +35,46 @@ public class CliStageController implements GameController {
     @Override
     public void setInput(String input) {}
 
-    public void moveHero(Direction direction) {
-        plot.getPlotHero().getPhysicsCharacter().move(direction);
+    public void up() {
+        plot.getPlotHero().getPhysicsCharacter().move(Direction.UP);
     }
 
-    public void rotateHero(RotationDirection rotationDirection) {
-        plot.getPlotHero().getPhysicsCharacter().rotate(rotationDirection);
+    public void down() {
+        plot.getPlotHero().getPhysicsCharacter().move(Direction.DOWN);
     }
 
-    public void attackWithHero() {
+    public void right() {
+        plot.getPlotHero().getPhysicsCharacter().move(Direction.RIGHT);
+    }
+
+    public void left() {
+        plot.getPlotHero().getPhysicsCharacter().move(Direction.LEFT);
+    }
+
+    public void rotateClockwise() {
+        plot.getPlotHero().getPhysicsCharacter().rotate(RotationDirection.CLOCKWISE);
+    }
+
+    public void rotateUnclockwise() {
+        plot.getPlotHero().getPhysicsCharacter().rotate(RotationDirection.UNCLOCKWISE);
+    }
+
+    public void attack() {
         plot.getPlotHero().getPhysicsCharacter().attack();
     }
 
-    public void healHero() {
+    public void heal() {
         plot.getPlotHero().getPhysicsCharacter().heal();
+    }
+
+    public void endTurn() {
+        plot.getPlotHero().getPhysicsCharacter().endTurn();
     }
 
     public void save() {
         // TODO
+    }
+    public void quit() {
+        plot.getCurrentStage().quit();
     }
 }

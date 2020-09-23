@@ -1,6 +1,6 @@
 package com.perfectsoft.game.render.cli;
 
-import com.perfectsoft.game.controller.cli.CliMenuSection;
+import com.perfectsoft.game.controller.MenuSection;
 import com.perfectsoft.game.plot.PlotStage;
 import com.perfectsoft.game.render.PlotRenderer;
 
@@ -15,11 +15,11 @@ public class CliPlotPrinter implements PlotRenderer {
     }
 
     @Override
-    public void renderPlotStage(PlotStage plotStage, CliMenuSection<?> cliMenuSection) {
+    public void renderPlotStage(PlotStage plotStage, MenuSection<?> menuSection) {
 
         plotStage.removeEventToShow().ifPresent(plotEvent -> {
-            cliMenuSection.setMessage(plotEvent.getStory());
-            cliMenuPrinterService.printMenuWithMessage(cliMenuSection, messageTitle);
+            menuSection.setMessage(plotEvent.getStory());
+            cliMenuPrinterService.printMenuWithMessage(menuSection, messageTitle);
         });
     }
 }

@@ -87,6 +87,7 @@ public class PlotEngineStage implements PlotStage, Consumer<Consumer<PlotStage>>
     public void run() {
         accept(PlotActionFactory.getInstance().runStageAction());
         running = true;
+        physicsStage.initStage();
     }
 
     @Override

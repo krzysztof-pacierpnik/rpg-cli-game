@@ -6,6 +6,7 @@ import com.perfectsoft.game.plot.Plot;
 import com.perfectsoft.game.plot.PlotActionChannel;
 import com.perfectsoft.game.plot.actions.PlotActionFactory;
 import com.perfectsoft.game.render.MenuRenderer;
+import com.perfectsoft.game.texture.cli.CliStageRenderer;
 
 import java.util.Scanner;
 import java.util.function.Consumer;
@@ -19,6 +20,7 @@ public class CliMainGameController implements GameController {
     private final CliPlotController cliPlotController;
     private final CliMainStageController cliMainStageController;
     private final CliStageController cliStageController;
+    private final CliStageRenderer cliStageRenderer;
     private final PlotConf plotConf;
     private final PlotActionFactory plotActionFactory;
     private final Scanner scanner;
@@ -31,7 +33,7 @@ public class CliMainGameController implements GameController {
                                  CliMenu<CliMainGameController> cliMenu, MenuRenderer menuRenderer,
                                  CliMainStageController stageController, CliPlotController cliPlotController,
                                  CliMainStageController cliMainStageController, CliStageController cliStageController,
-                                 PlotConf plotConf, PlotActionFactory plotActionFactory, Scanner scanner) {
+                                 CliStageRenderer cliStageRenderer, PlotConf plotConf, PlotActionFactory plotActionFactory, Scanner scanner) {
 
         this.plotActionChannel = plotActionChannel;
         this.cliMenu = cliMenu;
@@ -40,6 +42,7 @@ public class CliMainGameController implements GameController {
         this.cliPlotController = cliPlotController;
         this.cliMainStageController = cliMainStageController;
         this.cliStageController = cliStageController;
+        this.cliStageRenderer = cliStageRenderer;
         this.plotConf = plotConf;
         this.plotActionFactory = plotActionFactory;
         this.scanner = scanner;
@@ -62,7 +65,7 @@ public class CliMainGameController implements GameController {
         boolean success = false;
         try {
             //create plot
-            plot = plotConf.createPhysicsAndPlot(plotActionChannel, plotActionFactory, cliStageController);
+            plot = plotConf.createPhysicsAndPlot(plotActionChannel, plotActionFactory, cliStageController, cliStageRenderer);
             //set plot on controllers and
             cliStageController.setPlot(plot);
             cliPlotController.setPlot(plot);

@@ -8,13 +8,21 @@ import com.perfectsoft.game.physics.RotationDirection;
 import com.perfectsoft.game.plot.PlotActionChannel;
 import com.perfectsoft.game.plot.PlotCharacter;
 import com.perfectsoft.game.plot.actions.PlotActionFactory;
+import com.perfectsoft.game.render.RenderCharacter;
+
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledFuture;
+import java.util.function.Supplier;
 
 public class FromAbovePhysicsCharacter implements PhysicsCharacter {
 
     private final GameController gameController;
     private final PlotActionChannel plotActionChannel;
     private final PlotActionFactory plotActionFactory;
+    private final RenderCharacter renderCharacter;
 
+    private ScheduledFuture<?> renderFuture;
     private FromAbovePhysicsStage physicsStage;
     private PlotCharacter plotCharacter;
 
@@ -26,22 +34,18 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
     private int hitPoints;
 
     private int maxHitPoints;
-    private int moveCost = 1;
-    private int rotationCost = 1;
-    private int attackCost = 2;
-    private int healCost = 5;
-    private int healHitPoints = 10;
 
     private Direction direction;
     private Position position;
     private Position newPosition;
 
     public FromAbovePhysicsCharacter(GameController gameController, PlotActionChannel plotActionChannel,
-                                     PlotActionFactory plotActionFactory) {
+                                     PlotActionFactory plotActionFactory, RenderCharacter renderCharacter) {
 
         this.gameController = gameController;
         this.plotActionChannel = plotActionChannel;
         this.plotActionFactory = plotActionFactory;
+        this.renderCharacter = renderCharacter;
     }
 
     @Override
@@ -49,48 +53,71 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
         return gameController;
     }
 
-
     @Override
-    public void move(Direction direction) {
+    public void move(final Direction direction) {
 
-        if (actionPoints >= moveCost) {
+        int moveCost = 1;
+        takeAction(moveCost, () -> {
+
             newPosition = position.move(direction);
-            if (!physicsStage.isOutOfBound(this)) {
+            if (physicsStage.isInBound(newPosition)) {
                 if (physicsStage.detectCollision(this).isPresent()) {
-                    // TODO  schedule this changes and change states for animation
                     position = newPosition;
-                    actionPoints -= moveCost;
+                    return Optional.of(renderCharacter.move(direction, position));
                 }
             }
-        }
-
+            return Optional.empty();
+        });
     }
 
     @Override
-    public void rotate(RotationDirection rotationDirection) {
+    public void rotate(final RotationDirection rotationDirection) {
 
-        if (actionPoints >= rotationCost) {
-            // TODO  schedule this changes and change states for animation
-            actionPoints -= rotationCost;
+        int rotationCost = 1;
+        takeAction(rotationCost, () -> {
+
             direction = direction.rotate(rotationDirection);
-        }
+            return Optional.empty();
+        });
     }
 
     @Override
     public void attack() {
-        // TODO
+
+        int attackCost = 2;
+        takeAction(attackCost, () -> {
+
+            newPosition = position.move(direction);
+            if (physicsStage.isInBound(newPosition)) {
+                Optional<FromAbovePhysicsCharacter> otherOpt = physicsStage.detectCollision(this);
+                if (otherOpt.isPresent()) {
+                    FromAbovePhysicsCharacter other = otherOpt.get();
+                    int damage = getAttack() - other.getDefence();
+                    if (damage > 0) {
+                        experience += damage;
+                        other.takeHit(this, damage);
+                    }
+                    return Optional.of(renderCharacter.attack(direction, position, other.renderCharacter));
+                }
+            }
+            return Optional.empty();
+        });
     }
 
     @Override
     public void heal() {
 
-        if (actionPoints >= healCost) {
-            actionPoints -= healCost;
+        int healCost = 5;
+        takeAction(healCost, () -> {
+
+            int healHitPoints = 10;
             hitPoints += healHitPoints;
             if (hitPoints > maxHitPoints) {
                 hitPoints = maxHitPoints;
             }
-        }
+            return Optional.empty();
+        });
+
     }
 
     @Override
@@ -101,21 +128,54 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
     public void initForStage() {
 
         this.hitPoints = maxHitPoints;
+        renderCharacter.init(direction, position);
     }
 
-    private boolean takeHit(FromAbovePhysicsCharacter attacker) {
-        // TODO calculate damage and return true if dead
-        return false;
+    private void takeHit(FromAbovePhysicsCharacter attacker, int damage) {
+
+        hitPoints -= damage;
+        if (hitPoints < 0) {
+            killedBy(attacker);
+            renderCharacter.takeHit(direction, position);
+        }
     }
 
-    private void killed(FromAbovePhysicsCharacter victim) {
+    private void killedBy(FromAbovePhysicsCharacter attacker) {
 
+        physicsStage.characterKilled(this);
         plotActionChannel.publish(
-                plotActionFactory.characterKilledCharacterAction(getPlotCharacter(), victim.getPlotCharacter()));
+                plotActionFactory.characterKilledCharacterAction(attacker.getPlotCharacter(), getPlotCharacter()));
+    }
+
+    private void takeAction(int actionPointNeeded, Supplier<Optional<ScheduledFuture<?>>> action) {
+
+        if (actionPoints >= actionPointNeeded) {
+            action.get().ifPresent(renderFuture -> {
+
+                actionPoints -= actionPointNeeded;
+                this.renderFuture = renderFuture;
+                waitForAnimationEnd();
+            });
+        }
+    }
+
+    private void waitForAnimationEnd() {
+
+        try {
+            renderFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException("Failed to wait for animation end", e);
+        }
+        renderFuture = null;
     }
 
     public PlotCharacter getPlotCharacter() {
         return plotCharacter;
+    }
+
+    @Override
+    public RenderCharacter getRenderCharacter() {
+        return renderCharacter;
     }
 
     public void setPhysicsStage(FromAbovePhysicsStage physicsStage) {
@@ -125,10 +185,6 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
     @Override
     public void setPlotCharacter(PlotCharacter plotCharacter) {
         this.plotCharacter = plotCharacter;
-    }
-
-    public Direction getDirection() {
-        return direction;
     }
 
     public Position getPosition() {
@@ -155,20 +211,8 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
         this.defence = defence;
     }
 
-    public int getMaxHitPoints() {
-        return maxHitPoints;
-    }
-
     public void setMaxHitPoints(int maxHitPoints) {
         this.maxHitPoints = maxHitPoints;
-    }
-
-    public int getExperience() {
-        return experience;
-    }
-
-    public void setExperience(int experience) {
-        this.experience = experience;
     }
 
     public int getSpeed() {
@@ -186,5 +230,9 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
     @Override
     public boolean isDead() {
         return maxHitPoints <= 0;
+    }
+
+    public boolean isAlive() {
+        return !isDead();
     }
 }

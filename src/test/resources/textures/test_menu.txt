@@ -1,0 +1,2 @@
+Opcja 1       Opcja 3
+Opcja 2       Opcja 4

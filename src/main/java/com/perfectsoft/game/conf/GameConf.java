@@ -1,8 +1,9 @@
 package com.perfectsoft.game.conf;
 
+import com.perfectsoft.game.controller.MenuSection;
 import com.perfectsoft.game.controller.cli.*;
 import com.perfectsoft.game.controller.cli.conf.CliMenuConf;
-import com.perfectsoft.game.dao.properties.FilesUtils;
+import com.perfectsoft.game.dao.properties.PropertiesUtils;
 import com.perfectsoft.game.plot.actions.PlotActionFactory;
 import com.perfectsoft.game.plot.engine.PlotEngineActionChannel;
 import com.perfectsoft.game.render.MenuRenderer;
@@ -10,6 +11,11 @@ import com.perfectsoft.game.render.PlotRenderer;
 import com.perfectsoft.game.render.cli.CliMenuPrinter;
 import com.perfectsoft.game.render.cli.CliMenuPrinterService;
 import com.perfectsoft.game.render.cli.CliPlotPrinter;
+import com.perfectsoft.game.render.cli.CliRenderMenu;
+import com.perfectsoft.game.texture.Texture;
+import com.perfectsoft.game.texture.cli.CliPoint;
+import com.perfectsoft.game.texture.cli.CliStageRenderer;
+import com.perfectsoft.game.texture.cli.CliTextureReader;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -27,7 +33,8 @@ public final class GameConf {
 
     private static CliMainGameController createGameController(final PlotConf plotConf) throws IOException {
 
-        Properties properties = FilesUtils.loadProperties("/app.properties");
+        Properties properties = PropertiesUtils.loadProperties("/app.properties");
+
 
         //create action channels
         PlotEngineActionChannel plotEngineActionChannel = new PlotEngineActionChannel();
@@ -38,16 +45,22 @@ public final class GameConf {
                 properties.getProperty("render.cli.menu.message-template"));
         CliMenu<CliMainGameController> cliMenu = CliMenuConf.createMainMenu();
         MenuRenderer menuRenderer = new CliMenuPrinter(cliMenuPrinterService, "MESSAGE");
-        CliMenuSection<CliPlotController> eventMenuSection = CliMenuConf.getEventMenuSection();
+        MenuSection<CliPlotController> eventMenuSection = CliMenuConf.getEventMenuSection();
         PlotRenderer plotRenderer = new CliPlotPrinter(cliMenuPrinterService, "STORY");
 
         Scanner scanner = new Scanner(System.in);
         CliPlotController cliPlotController = new CliPlotController(plotRenderer, eventMenuSection, scanner);
         CliMainStageController cliMainStageController = new CliMainStageController(plotEngineActionChannel, cliPlotController);
-        CliStageController cliStageController = new CliStageController(scanner, plotEngineActionChannel);
+        CliMenu<CliStageController> stageMenu = CliMenuConf.createStageMenu();
+        CliStageController cliStageController = new CliStageController(scanner, stageMenu);
 
+        Texture screenTexture = CliTextureReader.readTexture("stage_screen", new CliPoint(0,0));
+        CliRenderMenu cliRenderMenu = new CliRenderMenu(stageMenu);
+        int animationDelay = Integer.parseInt(properties.getProperty("render.cli.animation.duration-millis"));
+        CliStageRenderer cliStageRenderer = new CliStageRenderer(screenTexture, cliRenderMenu, animationDelay);
 
         return new CliMainGameController(plotEngineActionChannel, cliMenu, menuRenderer, cliMainStageController,
-                cliPlotController, cliMainStageController, cliStageController, plotConf, plotActionFactory, scanner);
+                cliPlotController, cliMainStageController, cliStageController, cliStageRenderer,
+                plotConf, plotActionFactory, scanner);
     }
 }

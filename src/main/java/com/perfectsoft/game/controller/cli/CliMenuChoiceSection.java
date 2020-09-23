@@ -1,6 +1,8 @@
 package com.perfectsoft.game.controller.cli;
 
 import com.perfectsoft.game.controller.GameController;
+import com.perfectsoft.game.controller.MenuItem;
+import com.perfectsoft.game.controller.MenuSection;
 
 import java.util.List;
 import java.util.Map;
@@ -9,20 +11,20 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class CliMenuChoiceSection<T extends GameController> implements CliMenuSection<T> {
+public class CliMenuChoiceSection<T extends GameController> implements MenuSection<T> {
 
-    private final Map<String, CliMenuItem<T>> itemMap;
-    private final List<CliMenuItem<T>> items;
+    private final Map<String, MenuItem<T>> itemMap;
+    private final List<MenuItem<T>> items;
     private String errorMessage;
 
-    public CliMenuChoiceSection(List<CliMenuItem<T>> items) {
+    public CliMenuChoiceSection(List<MenuItem<T>> items) {
         this.items = items;
-        this.itemMap = items.stream().collect(Collectors.toMap(CliMenuItem::getCliCommand, item -> item));
+        this.itemMap = items.stream().collect(Collectors.toMap(MenuItem::getCliCommand, item -> item));
     }
 
     @Override
     public Consumer<T> get(String input) {
-        CliMenuItem<T> item = itemMap.get(input);
+        MenuItem<T> item = itemMap.get(input);
         if (item != null) {
             return item.getCommand();
         } else {
@@ -35,7 +37,7 @@ public class CliMenuChoiceSection<T extends GameController> implements CliMenuSe
         return IntStream
                 .range(0, items.size())
                 .mapToObj(idx -> {
-                    CliMenuItem<T> item = items.get(idx);
+                    MenuItem<T> item = items.get(idx);
                     return String.format("%d. %s (%s)", idx, item.getOptionName(), item.getCliCommand());
                 })
                 .collect(Collectors.toList());

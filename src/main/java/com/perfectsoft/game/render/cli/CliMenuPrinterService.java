@@ -1,6 +1,6 @@
 package com.perfectsoft.game.render.cli;
 
-import com.perfectsoft.game.controller.cli.CliMenuSection;
+import com.perfectsoft.game.controller.MenuSection;
 
 public final class CliMenuPrinterService {
 
@@ -14,14 +14,14 @@ public final class CliMenuPrinterService {
         this.messageTemplate = messageTemplate;
     }
 
-    public void printMenuWithMessage(CliMenuSection<?> cliMenuSection, String messageTitle) {
+    public void printMenuWithMessage(MenuSection<?> menuSection, String messageTitle) {
 
         System.out.print(CliMenuPrinterService.RETURN_CLEAR_SEQ);
-        cliMenuSection.getMessage()
+        menuSection.getMessage()
                 .ifPresent(err -> System.out.printf(messageTemplate, messageTitle, err));
-        cliMenuSection.getItemsToRender().forEach(System.out::println);
+        menuSection.getItemsToRender().forEach(System.out::println);
         System.out.flush();
 
-        cliMenuSection.setMessage(null);
+        menuSection.setMessage(null);
     }
 }

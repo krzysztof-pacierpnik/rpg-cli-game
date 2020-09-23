@@ -1,18 +1,19 @@
 package com.perfectsoft.game.controller.cli;
 
 import com.perfectsoft.game.controller.GameController;
+import com.perfectsoft.game.controller.MenuSection;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class CliMenuInputSection<T extends GameController> implements CliMenuSection<T> {
+public class MenuInputSection<T extends GameController> implements MenuSection<T> {
 
     private final String description;
     private final Consumer<T> controllerConsumer;
     private String errorMessage;
 
-    public CliMenuInputSection(String description, Consumer<T> controllerConsumer) {
+    public MenuInputSection(String description, Consumer<T> controllerConsumer) {
         this.description = description;
         this.controllerConsumer = controllerConsumer;
     }

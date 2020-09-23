@@ -1,16 +1,17 @@
 package com.perfectsoft.game.controller.cli;
 
 import com.perfectsoft.game.controller.GameController;
+import com.perfectsoft.game.controller.MenuSection;
 
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class CliMenu<T extends GameController> {
 
-    private final Map<String, CliMenuSection<T>> sectionMap;
-    private CliMenuSection<T> currentSection;
+    private final Map<String, MenuSection<T>> sectionMap;
+    private MenuSection<T> currentSection;
 
-    public CliMenu(CliMenuSection<T> currentSection, Map<String, CliMenuSection<T>> sectionMap) {
+    public CliMenu(MenuSection<T> currentSection, Map<String, MenuSection<T>> sectionMap) {
         this.sectionMap = sectionMap;
         this.currentSection = currentSection;
     }
@@ -19,12 +20,12 @@ public class CliMenu<T extends GameController> {
         return currentSection.get(input);
     }
 
-    public CliMenuSection<T> getCurrentSection() {
+    public MenuSection<T> getCurrentSection() {
         return currentSection;
     }
 
     public void setCurrentSection(String name) {
-        CliMenuSection<T> section = sectionMap.get(name);
+        MenuSection<T> section = sectionMap.get(name);
         if (section != null) {
             currentSection = section;
         }

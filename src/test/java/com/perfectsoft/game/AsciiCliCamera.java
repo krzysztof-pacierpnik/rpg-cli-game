@@ -1,7 +1,6 @@
 package com.perfectsoft.game;
 
 import com.perfectsoft.game.physics.PhysicsStage;
-import com.perfectsoft.game.render.Camera;
 
 import java.io.Console;
 import java.io.IOException;
@@ -15,7 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class AsciiCliCamera implements Camera {
+public class AsciiCliCamera {
 
     byte[][] stage = new byte[100][100];
     byte[][] character = readPicture("C:/Users/Krzysiek/Downloads/monster frog");
@@ -93,7 +92,6 @@ public class AsciiCliCamera implements Camera {
         System.out.flush();
     }
 
-    @Override
     public void render(PhysicsStage physicsStage) {
         for (int y = 0; y < buff.length; y++) {
             for (int x = 0; x < buff.length; x ++) {

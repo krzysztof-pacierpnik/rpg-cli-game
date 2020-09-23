@@ -1,10 +1,11 @@
 package com.perfectsoft.game.controller.cli;
 
 import com.perfectsoft.game.controller.GameController;
+import com.perfectsoft.game.controller.MenuItem;
 
 import java.util.function.Consumer;
 
-public class CliMenuActionItem<T extends GameController> implements CliMenuItem<T> {
+public class CliMenuActionItem<T extends GameController> implements MenuItem<T> {
 
     private final String cliCommand;
     private final String optionName;
