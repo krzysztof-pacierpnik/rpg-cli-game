@@ -22,6 +22,7 @@ public class CliRenderCharacter implements RenderCharacter, Supplier<Texture> {
     private final TextureTemplate attackTexture;
     private final TextureTemplate takeHitTexture;
 
+    private Point middlePointOnStage;
     private Texture currentTexture;
 
     public CliRenderCharacter(StageRenderer stageRenderer, TextureTemplate standTexture,
@@ -41,8 +42,7 @@ public class CliRenderCharacter implements RenderCharacter, Supplier<Texture> {
     @Override
     public void init(Direction direction, Position position) {
 
-        Point midPoint = calculateMiddlePoint(position);
-        rotateMoveCurrentTexture(standTexture, direction, midPoint);
+        rotateMoveCurrentTexture(standTexture, direction, position);
     }
 
     @Override
@@ -60,15 +60,13 @@ public class CliRenderCharacter implements RenderCharacter, Supplier<Texture> {
     @Override
     public void takeHit(Direction direction, Position position) {
 
-        Point midPoint = calculateMiddlePoint(position);
-        rotateMoveCurrentTexture(takeHitTexture, direction, midPoint);
+        rotateMoveCurrentTexture(takeHitTexture, direction, position);
     }
 
     @Override
     public void recover(Direction direction, Position position) {
 
-        Point midPoint = calculateMiddlePoint(position);
-        rotateMoveCurrentTexture(standTexture, direction, midPoint);
+        rotateMoveCurrentTexture(standTexture, direction, position);
     }
 
     @Override
@@ -85,8 +83,7 @@ public class CliRenderCharacter implements RenderCharacter, Supplier<Texture> {
                                           Position position) {
 
         try {
-            Point middlePoint = calculateMiddlePoint(position);
-            rotateMoveCurrentTexture(template, direction, middlePoint);
+            rotateMoveCurrentTexture(template, direction, position);
             stageRenderer.delayStageRendering(cliRenderStage).get();
             recover(direction, position);
             if (other != null) other.recover(direction, position);
@@ -98,16 +95,23 @@ public class CliRenderCharacter implements RenderCharacter, Supplier<Texture> {
         }
     }
 
-    private Point calculateMiddlePoint(Position position) {
+    public void calculateMiddlePoint(Position position) {
+
         final int fieldSize = cliRenderStage.getFieldSize();
-        final int fieldMiddle = fieldSize / 2 + 1;
-        return new CliPoint(position.getX() * fieldSize + fieldMiddle,
+        final int fieldMiddle = fieldSize / 2;
+        middlePointOnStage = new CliPoint(position.getX() * fieldSize + fieldMiddle,
                 position.getY() * fieldSize + fieldMiddle);
     }
 
-    private void rotateMoveCurrentTexture(TextureTemplate template, Direction direction, Point middlePosition) {
+    private void rotateMoveCurrentTexture(TextureTemplate template, Direction direction, Position position) {
 
-        currentTexture = template.rotateMoveTo(direction, middlePosition);
+        calculateMiddlePoint(position);
+        Point positionAlignedToCamera = cliRenderStage.alignToCamera(middlePointOnStage);
+        currentTexture = template.rotateMoveTo(direction, positionAlignedToCamera, 2);
+    }
+
+    public Point getMiddlePointOnStage() {
+        return middlePointOnStage;
     }
 
     @Override

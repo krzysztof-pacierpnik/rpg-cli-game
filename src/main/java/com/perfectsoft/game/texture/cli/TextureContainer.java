@@ -18,7 +18,7 @@ public class TextureContainer implements Texture {
         this.mainTexture = mainTexture;
 
         final Comparator<PointTexture> xComp = Comparator.comparingInt(pt -> pt.getPoint().getX());
-        final Comparator<PointTexture> yComp = Comparator.comparingInt(pt -> pt.getPoint().getX());
+        final Comparator<PointTexture> yComp = Comparator.comparingInt(pt -> pt.getPoint().getY());
         xSortedPointTextures = indexTexturesByComparator(nestedTextures, xComp);
         ySortedPointTextures = indexTexturesByComparator(nestedTextures, yComp);
     }
@@ -49,10 +49,17 @@ public class TextureContainer implements Texture {
 
         final Optional<Texture> nestedTextureOpt = findNestedTextureAtPoint(point);
         if (nestedTextureOpt.isPresent()) {
-            return nestedTextureOpt.get().getCharAtPoint(point.subtract(mainTexture.getUpperLeftCornerPosition()));
-        } else {
-            return mainTexture.getCharAtPoint(point);
+
+            final Texture texture = nestedTextureOpt.get();
+            Optional<Byte> characterOpt = texture.getCharAtPoint(point.subtract(mainTexture.getUpperLeftCornerPosition()));
+            if (characterOpt.isPresent()) {
+                if (texture.isTransparentBackground() && CliTexture.TRANSPARENT_CHARACTER == characterOpt.get()) {
+                    return mainTexture.getCharAtPoint(point);
+                }
+                return characterOpt;
+            }
         }
+        return mainTexture.getCharAtPoint(point);
     }
 
     private Optional<Texture> findNestedTextureAtPoint(final Point point) {
@@ -82,11 +89,12 @@ public class TextureContainer implements Texture {
                 .collect(Collectors.toCollection(TreeSet::new));
 
         //when surrounding points exists and are owned by the same Texture we are inside it
+        yLessSet.retainAll(yMoreSet);
+        yLessSet.retainAll(xLessSet);
+        yLessSet.retainAll(xMoreSet);
+
         SortedSet<Texture> zIndexSortedSurrTex = new TreeSet<>(Comparator.comparingInt(Texture::getZIndex));
         zIndexSortedSurrTex.addAll(yLessSet);
-        zIndexSortedSurrTex.retainAll(yMoreSet);
-        zIndexSortedSurrTex.retainAll(xLessSet);
-        zIndexSortedSurrTex.retainAll(xMoreSet);
 
         if (!zIndexSortedSurrTex.isEmpty()) {
             return Optional.of(zIndexSortedSurrTex.last());
@@ -127,5 +135,33 @@ public class TextureContainer implements Texture {
     @Override
     public Iterable<Byte> iterator() {
         return new CliTextureIterator(this);
+    }
+
+    @Override
+    public UUID getUuid() {
+        return mainTexture.getUuid();
+    }
+
+    @Override
+    public boolean isTransparentBackground() {
+        return mainTexture.isTransparentBackground();
+    }
+
+    @Override
+    public int compareTo(Texture o) {
+        return mainTexture.compareTo(o);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TextureContainer that = (TextureContainer) o;
+        return Objects.equals(mainTexture, that.mainTexture);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mainTexture);
     }
 }

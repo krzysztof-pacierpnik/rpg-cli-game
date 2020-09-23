@@ -23,4 +23,6 @@ public interface PhysicsCharacter {
     void endTurn();
 
     boolean isDead();
+
+    void noop();
 }

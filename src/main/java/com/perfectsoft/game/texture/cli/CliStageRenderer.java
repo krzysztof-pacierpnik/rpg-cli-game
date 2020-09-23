@@ -13,6 +13,10 @@ import java.util.function.Supplier;
 
 public class CliStageRenderer implements StageRenderer {
 
+    static final String RETURN_CURSOR_SEQ = "\033[H";
+    static final String CLEAR_CONSOLE_UNDER_CURSOR_SEQ = "\033[2J";
+    static final String RETURN_CLEAR_SEQ = RETURN_CURSOR_SEQ + CLEAR_CONSOLE_UNDER_CURSOR_SEQ;
+
     private final Texture stageScreenTexture;
     private final Supplier<Texture> stageMenuTextureSupplier;
     private final int animationDelayMillis;
@@ -56,21 +60,31 @@ public class CliStageRenderer implements StageRenderer {
                 printStageScreen(screen.get());
                 rendered = true;
             }
-        } while(rendered);
+        } while (!rendered);
     }
 
     void printStageScreen(Texture screenTexture) {
 
-        try(OutputStream cliOutStream = new BufferedOutputStream(System.out)) {
+//        try(OutputStream cliOutStream = new BufferedOutputStream(System.out)) {
+//
+//            cliOutStream.write(RETURN_CLEAR_SEQ.getBytes());
+//            for (Byte aByte : screenTexture.iterator()) {
+//                cliOutStream.write(aByte);
+//            }
+//            cliOutStream.write('\n');
+//            cliOutStream.write('\r');
+//            cliOutStream.flush();
+//
+//        } catch (IOException e) {
+//            throw new RuntimeException("Failed to print stage screen", e);
+//        }
 
-            for (Byte aByte : screenTexture.iterator()) {
-                cliOutStream.write(aByte);
-            }
-            cliOutStream.flush();
-
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to print stage screen", e);
+        System.out.print(RETURN_CLEAR_SEQ);
+        for (Byte aByte : screenTexture.iterator()) {
+            System.out.print((char)aByte.byteValue());
         }
+        System.out.print('\n');
+        System.out.flush();
 
     }
 }

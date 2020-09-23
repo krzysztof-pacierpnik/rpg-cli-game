@@ -35,7 +35,6 @@ public final class GameConf {
 
         Properties properties = PropertiesUtils.loadProperties("/app.properties");
 
-
         //create action channels
         PlotEngineActionChannel plotEngineActionChannel = new PlotEngineActionChannel();
         PlotActionFactory plotActionFactory = PlotActionFactory.getInstance();
@@ -55,7 +54,7 @@ public final class GameConf {
         CliStageController cliStageController = new CliStageController(scanner, stageMenu);
 
         Texture screenTexture = CliTextureReader.readTexture("stage_screen", new CliPoint(0,0));
-        CliRenderMenu cliRenderMenu = new CliRenderMenu(stageMenu);
+        CliRenderMenu cliRenderMenu = new CliRenderMenu(stageMenu, new CliPoint(1, 111));
         int animationDelay = Integer.parseInt(properties.getProperty("render.cli.animation.duration-millis"));
         CliStageRenderer cliStageRenderer = new CliStageRenderer(screenTexture, cliRenderMenu, animationDelay);
 

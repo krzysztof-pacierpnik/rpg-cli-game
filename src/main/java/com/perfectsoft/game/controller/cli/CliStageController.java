@@ -71,6 +71,10 @@ public class CliStageController implements GameController {
         plot.getPlotHero().getPhysicsCharacter().endTurn();
     }
 
+    public void noop() {
+        plot.getPlotHero().getPhysicsCharacter().noop();
+    }
+
     public void save() {
         // TODO
     }

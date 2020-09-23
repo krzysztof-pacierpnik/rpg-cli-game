@@ -16,7 +16,7 @@ public final class CliMenuConf {
 
     public static CliMenu<CliMainGameController> createMainMenu() {
 
-        MenuSection<CliMainGameController> mainSection = new CliMenuChoiceSection<>(List.of(
+        MenuSection<CliMainGameController> mainSection = new CliMenuChoiceSection<>((ctrl) -> {}, List.of(
                 new CliMenuActionItem<>("c", "Create character",
                         ctrl -> ctrl.goToMenuSection(CREATE_CHARACTER)),
                 new CliMenuActionItem<>("n", "New game",
@@ -36,7 +36,7 @@ public final class CliMenuConf {
     }
     public static CliMenu<CliStageController> createStageMenu() {
 
-        MenuSection<CliStageController> stageSection = new CliMenuChoiceSection<>(List.of(
+        MenuSection<CliStageController> stageSection = new CliMenuChoiceSection<>(CliStageController::noop, List.of(
                 new CliMenuActionItem<>("8", "Up", CliStageController::up),
                 new CliMenuActionItem<>("5", "Down", CliStageController::down),
                 new CliMenuActionItem<>("6", "Right", CliStageController::right),
@@ -54,7 +54,7 @@ public final class CliMenuConf {
 
     public static MenuSection<CliPlotController> getEventMenuSection() {
 
-        return new CliMenuChoiceSection<>(List.of(
+        return new CliMenuChoiceSection<>((ctrl) -> {}, List.of(
                 new CliMenuActionItem<>("q", "OK", CliPlotController::quit)
         ));
     }

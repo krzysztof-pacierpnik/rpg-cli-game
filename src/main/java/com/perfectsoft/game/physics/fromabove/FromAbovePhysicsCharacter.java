@@ -17,6 +17,8 @@ import java.util.function.Supplier;
 
 public class FromAbovePhysicsCharacter implements PhysicsCharacter {
 
+    private final Direction initDirection;
+    private final Position initPosition;
     private final GameController gameController;
     private final PlotActionChannel plotActionChannel;
     private final PlotActionFactory plotActionFactory;
@@ -39,8 +41,11 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
     private Position position;
     private Position newPosition;
 
-    public FromAbovePhysicsCharacter(GameController gameController, PlotActionChannel plotActionChannel,
-                                     PlotActionFactory plotActionFactory, RenderCharacter renderCharacter) {
+    public FromAbovePhysicsCharacter(Direction initDirection, Position initPosition, GameController gameController,
+                                     PlotActionChannel plotActionChannel, PlotActionFactory plotActionFactory,
+                                     RenderCharacter renderCharacter) {
+        this.initDirection = initDirection;
+        this.initPosition = initPosition;
 
         this.gameController = gameController;
         this.plotActionChannel = plotActionChannel;
@@ -54,19 +59,19 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
     }
 
     @Override
-    public void move(final Direction direction) {
+    public void move(final Direction moveDirection) {
 
         int moveCost = 1;
         takeAction(moveCost, () -> {
 
-            newPosition = position.move(direction);
+            newPosition = position.move(moveDirection);
             if (physicsStage.isInBound(newPosition)) {
-                if (physicsStage.detectCollision(this).isPresent()) {
+                if (physicsStage.detectCollision(this).isEmpty()) {
                     position = newPosition;
-                    return Optional.of(renderCharacter.move(direction, position));
+                    return renderCharacter.move(moveDirection, position);
                 }
             }
-            return Optional.empty();
+            return renderCharacter.rotate(this.direction, position);
         });
     }
 
@@ -77,7 +82,7 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
         takeAction(rotationCost, () -> {
 
             direction = direction.rotate(rotationDirection);
-            return Optional.empty();
+            return renderCharacter.rotate(direction, position);
         });
     }
 
@@ -97,10 +102,9 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
                         experience += damage;
                         other.takeHit(this, damage);
                     }
-                    return Optional.of(renderCharacter.attack(direction, position, other.renderCharacter));
                 }
             }
-            return Optional.empty();
+            return renderCharacter.attack(direction, position, null);
         });
     }
 
@@ -115,19 +119,31 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
             if (hitPoints > maxHitPoints) {
                 hitPoints = maxHitPoints;
             }
-            return Optional.empty();
+            return renderCharacter.rotate(direction, position);
         });
 
     }
 
     @Override
     public void endTurn() {
+
+        actionPoints = speed;
         physicsStage.movingCharacterTurnEnd();
+        takeAction(0, () -> renderCharacter.rotate(direction, position));
+    }
+
+    @Override
+    public void noop() {
+
+        takeAction(0, () -> renderCharacter.rotate(direction, position));
     }
 
     public void initForStage() {
 
+        position = initPosition;
+        direction = initDirection;
         this.hitPoints = maxHitPoints;
+        actionPoints = speed;
         renderCharacter.init(direction, position);
     }
 
@@ -147,15 +163,13 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
                 plotActionFactory.characterKilledCharacterAction(attacker.getPlotCharacter(), getPlotCharacter()));
     }
 
-    private void takeAction(int actionPointNeeded, Supplier<Optional<ScheduledFuture<?>>> action) {
+    private void takeAction(int actionPointNeeded, Supplier<ScheduledFuture<?>> action) {
 
         if (actionPoints >= actionPointNeeded) {
-            action.get().ifPresent(renderFuture -> {
 
-                actionPoints -= actionPointNeeded;
-                this.renderFuture = renderFuture;
-                waitForAnimationEnd();
-            });
+            this.renderFuture = action.get();
+            actionPoints -= actionPointNeeded;
+            waitForAnimationEnd();
         }
     }
 

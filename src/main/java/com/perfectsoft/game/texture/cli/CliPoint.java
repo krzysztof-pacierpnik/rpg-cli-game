@@ -1,6 +1,5 @@
 package com.perfectsoft.game.texture.cli;
 
-import com.perfectsoft.game.physics.Direction;
 import com.perfectsoft.game.physics.RotationDirection;
 import com.perfectsoft.game.texture.Point;
 
@@ -29,11 +28,18 @@ public class CliPoint implements Point, Comparable<Point> {
         if (RotationDirection.NOOP == multi) {
             return this;
         }
+        if (RotationDirection.INVERSE == multi) {
+            return new CliPoint(x * multi.getXMultiplier(), y * multi.getYMultiplier());
+        }
         return new CliPoint(y * multi.getXMultiplier(), x * multi.getYMultiplier());
     }
 
     public CliPoint negate() {
         return new CliPoint(-x, -y);
+    }
+
+    public CliPoint middleDistance(Point other) {
+        return new CliPoint((other.getX() - x) / 2 , (other.getY() - y) / 2 );
     }
 
     @Override

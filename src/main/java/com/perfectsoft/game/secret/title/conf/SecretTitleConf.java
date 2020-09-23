@@ -4,6 +4,8 @@ import com.perfectsoft.game.conf.PlotConf;
 import com.perfectsoft.game.controller.artificial.KillHeroController;
 import com.perfectsoft.game.controller.cli.CliStageController;
 import com.perfectsoft.game.dao.properties.PropertiesUtils;
+import com.perfectsoft.game.physics.Direction;
+import com.perfectsoft.game.physics.Position;
 import com.perfectsoft.game.physics.fromabove.FromAbovePhysicsCharacter;
 import com.perfectsoft.game.physics.fromabove.FromAbovePhysicsStage;
 import com.perfectsoft.game.plot.PlotActionChannel;
@@ -52,16 +54,16 @@ public final class SecretTitleConf implements PlotConf {
                 new CliPoint(1, 1), new CliPoint(100, 100), List.of(heroRender, monsterFrogRender));
 
         //configure physics with artificial controllers
-        FromAbovePhysicsCharacter heroPhysics = new FromAbovePhysicsCharacter(cliStageController, plotActionChannel,
-                plotActionFactory, heroRender);
+        FromAbovePhysicsCharacter heroPhysics = new FromAbovePhysicsCharacter(Direction.UP, new Position(8, 16),
+                cliStageController, plotActionChannel, plotActionFactory, heroRender);
         heroPhysics.setAttack(Integer.parseInt(properties.getProperty("warrior.physics.attack")));
         heroPhysics.setDefence(Integer.parseInt(properties.getProperty("warrior.physics.defence")));
         heroPhysics.setSpeed(Integer.parseInt(properties.getProperty("warrior.physics.speed")));
         heroPhysics.setMaxHitPoints(Integer.parseInt(properties.getProperty("warrior.physics.hit-points")));
 
         KillHeroController monsterFrogController = new KillHeroController(heroPhysics);
-        FromAbovePhysicsCharacter monsterFrogPhysics = new FromAbovePhysicsCharacter(monsterFrogController,
-                plotActionChannel, plotActionFactory, monsterFrogRender);
+        FromAbovePhysicsCharacter monsterFrogPhysics = new FromAbovePhysicsCharacter(Direction.DOWN, new Position(8, 2),
+                monsterFrogController, plotActionChannel, plotActionFactory, monsterFrogRender);
         monsterFrogPhysics.setAttack(Integer.parseInt(properties.getProperty("monster-frog.physics.attack")));
         monsterFrogPhysics.setDefence(Integer.parseInt(properties.getProperty("monster-frog.physics.defence")));
         monsterFrogPhysics.setSpeed(Integer.parseInt(properties.getProperty("monster-frog.physics.speed")));

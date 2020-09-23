@@ -1,5 +1,7 @@
 package com.perfectsoft.game.texture;
 
+import com.perfectsoft.game.texture.cli.CliPoint;
+
 public interface Point {
 
     int getX();
@@ -9,4 +11,6 @@ public interface Point {
     Point subtract(Point point);
 
     Point add(Point point);
+
+    CliPoint middleDistance(Point other);
 }

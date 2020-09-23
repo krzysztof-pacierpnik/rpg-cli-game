@@ -13,11 +13,13 @@ import java.util.stream.IntStream;
 
 public class CliMenuChoiceSection<T extends GameController> implements MenuSection<T> {
 
+    private final Consumer<T> noop;
     private final Map<String, MenuItem<T>> itemMap;
     private final List<MenuItem<T>> items;
     private String errorMessage;
 
-    public CliMenuChoiceSection(List<MenuItem<T>> items) {
+    public CliMenuChoiceSection(Consumer<T> noop, List<MenuItem<T>> items) {
+        this.noop = noop;
         this.items = items;
         this.itemMap = items.stream().collect(Collectors.toMap(MenuItem::getCliCommand, item -> item));
     }
@@ -28,7 +30,7 @@ public class CliMenuChoiceSection<T extends GameController> implements MenuSecti
         if (item != null) {
             return item.getCommand();
         } else {
-            return (ctrl) -> {};
+            return noop;
         }
     }
 

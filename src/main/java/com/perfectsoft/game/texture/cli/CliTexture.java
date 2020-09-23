@@ -5,7 +5,7 @@ import com.perfectsoft.game.texture.Texture;
 
 import java.util.*;
 
-public class CliTexture implements Texture, Comparable<CliTexture> {
+public class CliTexture implements Texture {
 
     public static final byte TRANSPARENT_CHARACTER = ' ';
 
@@ -16,28 +16,30 @@ public class CliTexture implements Texture, Comparable<CliTexture> {
     private final Point size;
     private final Point middlePosition;
     private final int zIndex;
+    private final boolean transparentBackground;
 
     public CliTexture(Collection<CliCharPoint> points) {
-        this(points, 0);
+        this(points, 0, false);
     }
 
-    public CliTexture(Collection<CliCharPoint> points, int zIndex) {
+    public CliTexture(Collection<CliCharPoint> points, int zIndex, boolean transparentBackground) {
 
         uuid = UUID.randomUUID();
+        this.transparentBackground = transparentBackground;
         this.zIndex = zIndex;
         this.sortedPoints = new TreeSet<>(points);
         first = sortedPoints.first();
         last = sortedPoints.last();
         size = new CliPoint(last.getX() + 1 - first.getX(), last.getY() + 1 - first.getY());
-        middlePosition = new CliPoint(last.getX() / 2 + first.getX(), last.getY() / 2 + first.getY());
+        this.middlePosition = new CliPoint(first.getX(), first.getY()).add(first.middleDistance(last));
     }
+
 
     @Override
     public Optional<Byte> getCharAtPoint(Point point) {
         return sortedPoints.parallelStream()
                 .filter(cliCharPoint ->
                         cliCharPoint.getX() == point.getX() && cliCharPoint.getY() == point.getY()
-                                && cliCharPoint.getCharacter() != TRANSPARENT_CHARACTER
                 )
                 .map(CliCharPoint::getCharacter)
                 .findAny();
@@ -57,8 +59,8 @@ public class CliTexture implements Texture, Comparable<CliTexture> {
     }
 
     @Override
-    public int compareTo(CliTexture o) {
-        return uuid.compareTo(o.uuid);
+    public int compareTo(Texture o) {
+        return uuid.compareTo(o.getUuid());
     }
 
     @Override
@@ -94,5 +96,15 @@ public class CliTexture implements Texture, Comparable<CliTexture> {
     @Override
     public Point getUpperLeftCornerPosition() {
         return first;
+    }
+
+    @Override
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    @Override
+    public boolean isTransparentBackground() {
+        return transparentBackground;
     }
 }

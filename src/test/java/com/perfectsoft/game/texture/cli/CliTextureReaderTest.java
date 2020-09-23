@@ -43,7 +43,7 @@ public class CliTextureReaderTest {
     public void readWarriorStandTexTemp() {
 
         TextureTemplate textureTemp = CliTextureReader.readTextureTemplate("warrior_stand");
-        Texture texture = textureTemp.rotateMoveTo(Direction.UP, new CliPoint(0,0));
+        Texture texture = textureTemp.rotateMoveTo(Direction.UP, new CliPoint(0,0), 0);
         Assertions.assertThat(texture.getSize()).isEqualTo(new CliPoint(9,9));
         Assertions.assertThat(texture.getMiddlePosition()).isEqualTo(new CliPoint(0,0));
         Assertions.assertThat(texture.getUpperLeftCornerPosition()).isEqualTo(new CliCharPoint(-4,-4, (byte)' '));

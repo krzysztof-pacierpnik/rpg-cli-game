@@ -8,7 +8,7 @@ public interface TextureTemplate {
 
     Point getLast();
 
-    Texture rotateMoveTo(Direction direction, Point middlePosition);
+    Texture rotateMoveTo(Direction direction, Point middlePosition, int zIndex);
 
-    Texture moveToBound(Point middlePosition, Point bound);
+    Texture moveToBound(Point middlePosition, Point first, Point last, int zIndex);
 }

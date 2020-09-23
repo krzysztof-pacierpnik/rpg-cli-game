@@ -22,16 +22,16 @@ public class CliTextureTemplate implements TextureTemplate {
         CliCharPoint tmpLast = tmpSortedPoints.last();
 
         size = new CliPoint(tmpLast.getX() + 1 - tmpFirst.getX(), tmpLast.getY() + 1 - tmpFirst.getY());
-        CliPoint tmpMiddlePosition = new CliPoint(tmpLast.getX() / 2 + tmpFirst.getX(), tmpLast.getY() / 2 + tmpFirst.getY());
+        CliPoint dist = tmpFirst.middleDistance(tmpLast);
 
         this.sortedPoints = points.stream()
-                .map(point -> point.subtract(tmpMiddlePosition))
+                .map(point -> point.subtract(dist))
                 .collect(Collectors.toCollection(TreeSet::new));
         last = tmpSortedPoints.last();
     }
 
     @Override
-    public Texture rotateMoveTo(Direction direction, Point middlePosition) {
+    public Texture rotateMoveTo(Direction direction, Point middlePosition, int zIndex) {
 
         RotationDirection rotationDirection = Direction.UP.rotationDirection(direction);
         Collection<CliCharPoint> rotatedPoints;
@@ -47,18 +47,19 @@ public class CliTextureTemplate implements TextureTemplate {
                 .map(point -> point.add(middlePosition))
                 .collect(Collectors.toList());
 
-        return new CliTexture(movedPoints);
+        return new CliTexture(movedPoints, zIndex, true);
     }
 
     @Override
-    public Texture moveToBound(Point middlePosition, Point bound) {
+    public Texture moveToBound(Point middlePosition, Point first, Point last, int zIndex) {
 
         List<CliCharPoint> movedInboundPoints = sortedPoints.stream()
                 .map(point -> point.add(middlePosition))
-                .filter(point -> point.getX() < bound.getX() && point.getY() < bound.getY())
+                .filter(point -> point.getX() >= first.getX() && point.getX() < last.getX()
+                        && point.getY() >= first.getX() && point.getY() < last.getY())
                 .collect(Collectors.toList());
 
-        return new CliTexture(movedInboundPoints);
+        return new CliTexture(movedInboundPoints, zIndex, false);
     }
 
     @Override

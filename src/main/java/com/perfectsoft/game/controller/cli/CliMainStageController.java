@@ -28,6 +28,7 @@ public class CliMainStageController implements GameController {
         PlotStage currentStage = plot.getCurrentStage();
         currentStage.run();
         plotController.run();
+        currentStage.getPhysicsStage().initStage();
 
         while (currentStage.isRunning()) {
 

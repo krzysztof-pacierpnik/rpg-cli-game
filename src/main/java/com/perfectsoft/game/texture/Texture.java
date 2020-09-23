@@ -1,10 +1,11 @@
 package com.perfectsoft.game.texture;
 
-import com.perfectsoft.game.physics.RotationDirection;
-
 import java.util.Optional;
+import java.util.UUID;
 
-public interface Texture {
+public interface Texture extends Comparable<Texture> {
+
+    UUID getUuid();
 
     Point getSize();
 
@@ -17,6 +18,8 @@ public interface Texture {
     Point getLast();
 
     int getZIndex();
+
+    boolean isTransparentBackground();
 
     Optional<Byte> getCharAtPoint(final Point point);
 

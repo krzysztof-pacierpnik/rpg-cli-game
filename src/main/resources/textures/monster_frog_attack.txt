@@ -1,9 +1,18 @@
-XXXXXXXXX
+
+
+
+X       X
 XX     XX
 X X   X X
-X  X X  X
-X   X   X
-X  X X  X
-X X   X X
-XX     XX
 XXXXXXXXX
+X * * * X
+X       X
+X       X
+X       X
+X       X
+X       X
+X * * * X
+XXXXXXXXX
+
+
+
