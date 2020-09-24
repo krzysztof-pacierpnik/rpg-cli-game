@@ -36,7 +36,7 @@ public class CliTextureReaderTest {
 
         Texture texture = CliTextureReader.readTexture("warrior_stand", new CliPoint(0,0));
         Assertions.assertThat(texture.getSize()).isEqualTo(new CliPoint(9,9));
-        Assertions.assertThat(texture.getMiddlePosition()).isEqualTo(new CliPoint(5,5));
+        Assertions.assertThat(texture.getMiddlePosition()).isEqualTo(new CliPoint(4,4));
     }
 
     @Test
