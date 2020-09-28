@@ -13,7 +13,7 @@ public class CliTextureIterator implements Iterable<Byte> {
 
     public CliTextureIterator(Texture texture) {
         this.texture = texture;
-        currPos = (CliPoint) texture.getFirst().subtract(new CliPoint(1, 0));
+        currPos = new CliPoint(-1, 0);
     }
 
     private boolean hasMorePoints()  {

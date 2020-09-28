@@ -1,6 +1,5 @@
 package com.perfectsoft.game.texture.cli;
 
-import com.perfectsoft.game.conf.PlotConf;
 import com.perfectsoft.game.controller.cli.CliMenu;
 import com.perfectsoft.game.controller.cli.CliStageController;
 import com.perfectsoft.game.controller.cli.conf.CliMenuConf;
@@ -8,13 +7,11 @@ import com.perfectsoft.game.physics.Direction;
 import com.perfectsoft.game.physics.PhysicsCharacter;
 import com.perfectsoft.game.physics.PhysicsStage;
 import com.perfectsoft.game.physics.Position;
-import com.perfectsoft.game.plot.Plot;
 import com.perfectsoft.game.plot.PlotCharacter;
 import com.perfectsoft.game.plot.PlotStage;
 import com.perfectsoft.game.render.cli.CliRenderCharacter;
 import com.perfectsoft.game.render.cli.CliRenderMenu;
 import com.perfectsoft.game.render.cli.CliRenderStage;
-import com.perfectsoft.game.render.cli.CliStageScreen;
 import com.perfectsoft.game.texture.Texture;
 import com.perfectsoft.game.texture.TextureTemplate;
 import org.junit.jupiter.api.Test;
@@ -23,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.OutputStream;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -37,6 +35,8 @@ public class CliStageRendererTest {
     private PlotCharacter hero;
     @Mock
     private PhysicsCharacter heroPhysics;
+    @Mock
+    private OutputStream renderStream;
 
     @Test
     public void readWarriorStandTexTemp() {
@@ -49,7 +49,7 @@ public class CliStageRendererTest {
 
         Texture screenTexture = CliTextureReader.readTexture("test_screen", new CliPoint(0, 0));
         TextureContainer screenContainer = new TextureContainer(screenTexture, List.of(menuTexture, warriorTexture));
-        CliStageRenderer cliStageRenderer = new CliStageRenderer(screenContainer, menuSupplier, 1000);
+        CliStageRenderer cliStageRenderer = new CliStageRenderer(screenContainer, menuSupplier, renderStream, 200);
         System.out.println("Texture:");
         cliStageRenderer.printStageScreen(screenContainer);
     }
@@ -61,7 +61,7 @@ public class CliStageRendererTest {
 
         Texture screenTexture = CliTextureReader.readTexture("stage_screen", new CliPoint(0,0));
         CliRenderMenu cliRenderMenu = new CliRenderMenu(stageMenu, new CliPoint(1, 111));
-        CliStageRenderer cliStageRenderer = new CliStageRenderer(screenTexture, cliRenderMenu, 1000);
+        CliStageRenderer cliStageRenderer = new CliStageRenderer(screenTexture, cliRenderMenu, renderStream, 1000);
 
         TextureTemplate warriorStand = CliTextureReader.readTextureTemplate("warrior_stand");
         TextureTemplate warriorWalk = CliTextureReader.readTextureTemplate("warrior_walk");

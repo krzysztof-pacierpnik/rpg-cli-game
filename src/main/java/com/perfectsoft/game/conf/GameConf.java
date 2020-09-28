@@ -17,7 +17,9 @@ import com.perfectsoft.game.texture.cli.CliPoint;
 import com.perfectsoft.game.texture.cli.CliStageRenderer;
 import com.perfectsoft.game.texture.cli.CliTextureReader;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -25,13 +27,19 @@ public final class GameConf {
 
     private GameConf() {}
 
-    public static void run(final PlotConf plotConf) throws IOException {
+    public static void run(final PlotConf plotConf) {
 
-        CliMainGameController controller = createGameController(plotConf);
-        controller.run();
+        try(OutputStream renderStream = new BufferedOutputStream(System.out, 12000)) {
+
+            CliMainGameController controller = createGameController(plotConf, renderStream);
+            controller.run();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed run game", e);
+        }
     }
 
-    private static CliMainGameController createGameController(final PlotConf plotConf) throws IOException {
+    private static CliMainGameController createGameController(final PlotConf plotConf, OutputStream renderStream)
+            throws IOException {
 
         Properties properties = PropertiesUtils.loadProperties("/app.properties");
 
@@ -56,7 +64,7 @@ public final class GameConf {
         Texture screenTexture = CliTextureReader.readTexture("stage_screen", new CliPoint(0,0));
         CliRenderMenu cliRenderMenu = new CliRenderMenu(stageMenu, new CliPoint(1, 111));
         int animationDelay = Integer.parseInt(properties.getProperty("render.cli.animation.duration-millis"));
-        CliStageRenderer cliStageRenderer = new CliStageRenderer(screenTexture, cliRenderMenu, animationDelay);
+        CliStageRenderer cliStageRenderer = new CliStageRenderer(screenTexture, cliRenderMenu, renderStream, animationDelay);
 
         return new CliMainGameController(plotEngineActionChannel, cliMenu, menuRenderer, cliMainStageController,
                 cliPlotController, cliMainStageController, cliStageController, cliStageRenderer,

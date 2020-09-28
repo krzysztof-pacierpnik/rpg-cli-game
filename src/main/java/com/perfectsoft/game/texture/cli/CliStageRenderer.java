@@ -19,15 +19,17 @@ public class CliStageRenderer implements StageRenderer {
 
     private final Texture stageScreenTexture;
     private final Supplier<Texture> stageMenuTextureSupplier;
+    private final OutputStream renderStream;
     private final int animationDelayMillis;
     private final Queue<CliStageScreen> screensToRender;
     private final ScheduledExecutorService renderSchedule;
 
     public CliStageRenderer(Texture stageScreenTexture, Supplier<Texture> stageMenuTextureSupplier,
-                            int animationDelayMillis) {
+                            OutputStream renderStream, int animationDelayMillis) {
 
         this.stageScreenTexture = stageScreenTexture;
         this.stageMenuTextureSupplier = stageMenuTextureSupplier;
+        this.renderStream = renderStream;
         this.animationDelayMillis = animationDelayMillis;
 
         screensToRender = new ConcurrentLinkedQueue<>();
@@ -64,27 +66,16 @@ public class CliStageRenderer implements StageRenderer {
     }
 
     void printStageScreen(Texture screenTexture) {
-
-//        try(OutputStream cliOutStream = new BufferedOutputStream(System.out)) {
-//
-//            cliOutStream.write(RETURN_CLEAR_SEQ.getBytes());
-//            for (Byte aByte : screenTexture.iterator()) {
-//                cliOutStream.write(aByte);
-//            }
-//            cliOutStream.write('\n');
-//            cliOutStream.write('\r');
-//            cliOutStream.flush();
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException("Failed to print stage screen", e);
-//        }
-
-        System.out.print(RETURN_CLEAR_SEQ);
-        for (Byte aByte : screenTexture.iterator()) {
-            System.out.print((char)aByte.byteValue());
+        try {
+            renderStream.write(RETURN_CLEAR_SEQ.getBytes());
+            for (Byte aByte : screenTexture.iterator()) {
+                renderStream.write(aByte);
+            }
+            renderStream.write('\n');
+            renderStream.write('\r');
+            renderStream.flush();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to write to render stream", e);
         }
-        System.out.print('\n');
-        System.out.flush();
-
     }
 }

@@ -68,10 +68,10 @@ public class FromAbovePhysicsCharacter implements PhysicsCharacter {
             if (physicsStage.isInBound(newPosition)) {
                 if (physicsStage.detectCollision(this).isEmpty()) {
                     position = newPosition;
-                    return renderCharacter.move(moveDirection, position);
+                    return renderCharacter.move(direction, position);
                 }
             }
-            return renderCharacter.rotate(this.direction, position);
+            return renderCharacter.rotate(direction, position);
         });
     }
 

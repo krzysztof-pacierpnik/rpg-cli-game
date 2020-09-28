@@ -16,6 +16,7 @@ repositories {
 
 test {
     useJUnitPlatform()
+    systemProperty 'manual.test', System.properties['manual.test']
 }
 
 dependencies {
